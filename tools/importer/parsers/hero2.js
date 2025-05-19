@@ -1,31 +1,29 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Extract the image
-  const picture = element.querySelector('picture');
-  const img = picture ? picture.querySelector('img') : null;
-  const image = img ? document.createElement('img') : null;
-  if (img && image) {
-    image.src = img.src;
-    image.alt = img.alt || '';
-  }
+  // Creating a section break
+  const hr = document.createElement('hr');
 
-  // Extract the headline
-  const headline = element.querySelector('h1');
-  const headingElement = headline ? document.createElement('h1') : null;
-  if (headline && headingElement) {
-    headingElement.textContent = headline.textContent;
-  }
+  // Extracting the hero image and heading dynamically
+  const heroImage = element.querySelector('picture');
+  const heroHeading = element.querySelector('h1');
 
-  // Content array for the block
-  const blockContent = [image, headingElement].filter(Boolean); // Filter out null/undefined values
+  // Handle missing elements gracefully
+  const imageContent = heroImage ? heroImage : document.createTextNode('No Image Available');
+  const headingContent = heroHeading ? document.createElement('h1') : document.createTextNode('No Heading Available');
+  if (heroHeading) headingContent.textContent = heroHeading.textContent;
 
-  // Create the hero block table
-  const heroTableCells = [
-    ['Hero'],
-    blockContent
+  // Correcting the header row to match example exactly
+  const headerRow = ['Hero']; // Matches the example header specifically
+
+  // Structure for the Hero block table - single cell in the content row
+  const tableCells = [
+    headerRow,  // Header row with exact match to example
+    [[imageContent, headingContent]],  // Content row combining image and heading into a single cell
   ];
-  const heroTable = WebImporter.DOMUtils.createTable(heroTableCells, document);
 
-  // Replace the original element properly
-  element.replaceWith(heroTable);
+  // Creating the block table using WebImporter.DOMUtils.createTable
+  const blockTable = WebImporter.DOMUtils.createTable(tableCells, document);
+
+  // Replacing the original element with the section break and block table
+  element.replaceWith(hr, blockTable);
 }

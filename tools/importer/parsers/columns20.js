@@ -1,42 +1,43 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Helper to create an <hr> section break
-  const createSectionBreak = () => document.createElement('hr');
+  // Create a section break
+  const hr = document.createElement('hr');
 
-  // Extract cards from the HTML
-  const cards = Array.from(element.querySelectorAll('.cards-wrapper .cards-card-body')).map((card) => {
-    const titleLink = card.querySelector('h3 a');
-    const title = titleLink ? titleLink.textContent.trim() : '';
-    const link = titleLink ? document.createElement('a') : null;
-    if (link) {
-      link.setAttribute('href', titleLink.href);
-      link.textContent = title;
+  // Extract cards and their content dynamically
+  const cards = Array.from(element.querySelectorAll('li')).map((card) => {
+    const imageEl = card.querySelector('img');
+    const image = imageEl ? document.createElement('img') : null;
+    if (image) {
+      image.src = imageEl.src;
+      image.alt = imageEl.alt || '';
     }
 
-    const description = card.querySelector('p') ? card.querySelector('p').textContent.trim() : '';
-    return [title, link, description].filter(item => item !== null); // Ensure no null values
+    const headerLinkEl = card.querySelector('h3 a');
+    const link = headerLinkEl ? document.createElement('a') : null;
+    if (link) {
+      link.href = headerLinkEl.href;
+      link.textContent = headerLinkEl.textContent.trim();
+    }
+
+    const descriptionEl = card.querySelector('p');
+    const descriptionText = descriptionEl ? descriptionEl.textContent.trim() : '';
+
+    return [
+      image,
+      link,
+      descriptionText
+    ];
   });
 
-  // Extract images from the HTML
-  const images = Array.from(element.querySelectorAll('.cards-wrapper .cards-card-image img')).map((img) => {
-    const image = document.createElement('img');
-    image.setAttribute('src', img.src);
-    image.setAttribute('alt', img.alt);
-    return image;
-  });
+  // Prepare the first row containing the block name
+  const headerRow = ['Columns'];
 
-  // Combine images and card data into rows
-  const rows = images.map((image, index) => {
-    const cardData = cards[index];
-    return [image, ...cardData];
-  });
+  // Combine the header row and card rows into the table data
+  const tableData = [headerRow, ...cards];
 
-  // Add a header row to the table
-  const tableData = [['Columns'], ...rows];
-
-  // Create the block table using WebImporter.DOMUtils.createTable
+  // Create the table block
   const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
 
-  // Insert the block table into the document
-  element.replaceWith(blockTable);
+  // Replace the original element with the hr and block table
+  element.replaceWith(hr, blockTable);
 }

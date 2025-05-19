@@ -1,29 +1,37 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const cells = [];
+    const cells = [];
 
-  // Extracting header row
-  const headerRow = ['Hero'];
-  cells.push(headerRow);
+    // Extracting block name for the header row
+    const headerRow = ['Hero'];
+    cells.push(headerRow);
 
-  // Extracting content row
-  const pictureElement = element.querySelector('picture img');
-  const headingElement = element.querySelector('h1');
+    // Extracting content for the second row
+    const content = [];
 
-  if (pictureElement && headingElement) {
-    // Ensure valid content for each cell
-    const imageClone = pictureElement.cloneNode(true);
-    const headingClone = headingElement.cloneNode(true);
+    // Background image
+    const imgElement = element.querySelector('picture img');
+    if (imgElement) {
+        const img = document.createElement('img');
+        img.src = imgElement.src;
+        img.alt = imgElement.alt;
+        content.push(img);
+    }
 
-    const contentRow = [[imageClone, headingClone]];
-    cells.push(...contentRow);
-  } else {
-    console.warn('Missing image or heading element in the hero block.');
-  }
+    // Title
+    const titleElement = element.querySelector('h1');
+    if (titleElement) {
+        const title = document.createElement('h1');
+        title.textContent = titleElement.textContent;
+        content.push(title);
+    }
 
-  // Create the table
-  const blockTable = WebImporter.DOMUtils.createTable(cells, document);
+    // Adding content to the second row as a single cell
+    cells.push([content]);
 
-  // Replace the original element
-  element.replaceWith(blockTable);
+    // Creating table
+    const table = WebImporter.DOMUtils.createTable(cells, document);
+
+    // Replacing the element
+    element.replaceWith(table);
 }

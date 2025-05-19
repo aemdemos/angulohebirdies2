@@ -1,44 +1,41 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Helper to extract images and links
-  const extractImage = (imgElement) => {
-    if (!imgElement) return null;
-    const img = document.createElement('img');
-    img.src = imgElement.getAttribute('src');
-    img.alt = imgElement.getAttribute('alt') || '';
-    return img;
-  };
+  const hr = document.createElement('hr');
 
-  const extractLink = (linkElement) => {
-    if (!linkElement) return null;
+  // Section Metadata
+  const sectionMetadata = [
+    ['Section Metadata'],
+    ['Cards'],
+  ];
+  const sectionMetadataTable = WebImporter.DOMUtils.createTable(sectionMetadata, document);
+
+  // Extract content
+  const header = element.querySelector('h2').textContent.trim();
+  const paragraphs = Array.from(element.querySelectorAll('.default-content-wrapper p')).map(p => p.cloneNode(true));
+  const cardsContent = Array.from(element.querySelectorAll('.cards-card-body strong a')).map(a => {
+    const title = a.textContent.trim();
+    const href = a.href;
     const link = document.createElement('a');
-    link.href = linkElement.getAttribute('href');
-    link.textContent = linkElement.textContent;
+    link.href = href;
+    link.textContent = title;
     return link;
-  };
-
-  const cardsWrapper = element.querySelector('.cards-wrapper');
-  if (!cardsWrapper) {
-    console.error('Cards wrapper not found');
-    return;
-  }
-
-  const cardElements = cardsWrapper.querySelectorAll('li');
-
-  const cardRows = Array.from(cardElements).map((card) => {
-    const cardImageElement = card.querySelector('img');
-    const cardImage = extractImage(cardImageElement);
-
-    const cardLinkElement = card.querySelector('a');
-    const cardLink = extractLink(cardLinkElement);
-
-    return [cardImage, cardLink];
   });
 
-  const headerRow = ['Cards'];
-  const rows = [headerRow, ...cardRows];
+  const images = Array.from(element.querySelectorAll('.cards-card-image img')).map(img => {
+    const image = document.createElement('img');
+    image.src = img.src;
+    image.alt = img.alt;
+    return image;
+  });
 
-  const block = WebImporter.DOMUtils.createTable(rows, document);
+  // Create columns block
+  const columnsHeader = ['Columns'];
+  const columnsContent = [
+    [header, paragraphs],
+    [...images, ...cardsContent],
+  ];
+  const columnsTable = WebImporter.DOMUtils.createTable([columnsHeader, ...columnsContent], document);
 
-  element.replaceWith(block);
+  // Replace element
+  element.replaceWith(hr, sectionMetadataTable, columnsTable);
 }

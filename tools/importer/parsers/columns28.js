@@ -1,45 +1,54 @@
 /* global WebImporter */
- export default function parse(element, { document }) {
-  // Helper function to extract image elements
-  const extractImage = (imgElement) => {
-    if (!imgElement) return '';
-    const { src, alt } = imgElement;
-    const image = document.createElement('img');
-    image.src = src;
-    image.alt = alt || '';
-    return image;
-  };
+export default function parse(element, { document }) {
+  // Extract the relevant content
+  const columnsContainer = element.querySelector('.columns-container');
+  if (!columnsContainer) return;
 
-  // Helper function to extract text content
-  const extractTextContent = (parentElement) => {
-    if (!parentElement) return '';
-    const fragment = document.createDocumentFragment();
-    parentElement.childNodes.forEach((node) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        fragment.appendChild(document.createTextNode(node.textContent));
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        fragment.appendChild(node.cloneNode(true));
-      }
-    });
-    return fragment;
-  };
+  const columnsWrapper = columnsContainer.querySelector('.columns-wrapper');
+  if (!columnsWrapper) return;
 
-  // Extract content from the provided HTML structure
-  const contentWrapper = element.querySelector('.columns-wrapper');
-  const columnsBlock = contentWrapper.querySelector('.columns.block');
+  const blockNameElement = columnsWrapper.querySelector('[data-block-name="columns"]');
+  const blockName = blockNameElement ? blockNameElement.dataset.blockName : 'Block';
 
-  const firstColumnContent = columnsBlock.querySelector('div:nth-child(1)');
-  const secondColumnContent = columnsBlock.querySelector('div:nth-child(2)');
+  const columnElements = columnsWrapper.querySelectorAll('div > div');
 
-  const headerRow = ['Columns'];
-  const contentRow = [
-    extractTextContent(firstColumnContent),
-    extractImage(secondColumnContent.querySelector('img')),
+  const contentCells = Array.from(columnElements).map((column) => {
+    const items = [];
+
+    // Extract heading
+    const heading = column.querySelector('h2');
+    if (heading) {
+      items.push(heading);
+    }
+
+    // Extract paragraph
+    const paragraph = column.querySelector('p');
+    if (paragraph) {
+      items.push(paragraph);
+    }
+
+    // Extract images
+    const image = column.querySelector('picture img');
+    if (image) {
+      const imgElement = document.createElement('img');
+      imgElement.src = image.src;
+      imgElement.alt = image.alt;
+      imgElement.width = image.width;
+      imgElement.height = image.height;
+      items.push(imgElement);
+    }
+
+    return items;
+  });
+
+  // Build the table
+  const tableData = [
+    [blockName],
+    ...contentCells,
   ];
 
-  const tableData = [headerRow, contentRow];
-  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
+  const table = WebImporter.DOMUtils.createTable(tableData, document);
 
-  // Replace the original element with the new block table
-  element.replaceWith(blockTable);
+  // Replace the original element with the table
+  element.replaceWith(table);
 }
