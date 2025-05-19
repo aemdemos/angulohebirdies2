@@ -1,54 +1,54 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-    const rows = [];
+  // Helper to create a table cell with content
+  const createCell = (content) => {
+    if (typeof content === 'string') {
+      return content;
+    } else if (Array.isArray(content)) {
+      return content.map(createCell);
+    } else if (content instanceof HTMLElement) {
+      return content;
+    } else {
+      return ''; // Handle edge case where content is invalid
+    }
+  };
 
-    // Founding Partners Section
-    const foundingPartnersHeader = ['Founding Partners'];
-    rows.push(foundingPartnersHeader);
+  // Extract content dynamically from the element
+  const content = [];
+  const paragraphs = Array.from(element.querySelectorAll('p'));
+  const images = Array.from(element.querySelectorAll('img'));
+  const headings = Array.from(element.querySelectorAll('h2, h3, h4'));
 
-    const foundingPartnersImage = element.querySelector('#founding-partners + p img');
-    const foundingPartnersDescription = element.querySelector('#phil-and-amy-mickelson').nextElementSibling;
-    rows.push([foundingPartnersImage]);
-    rows.push([foundingPartnersDescription]);
+  paragraphs.forEach((p) => {
+    content.push(createCell(p.cloneNode(true))); // Clone node to extract its content
+  });
 
-    // 4 Star Partners Section
-    const fourStarPartnersHeader = ['4 Star Partners'];
-    rows.push(fourStarPartnersHeader);
+  images.forEach((img) => {
+    const imageElement = document.createElement('img');
+    imageElement.src = img.getAttribute('src'); // Use dynamic src extraction
+    imageElement.alt = img.getAttribute('alt') || ''; // Handle missing alt
+    content.push(createCell(imageElement));
+  });
 
-    const fourStarPartnersImage = element.querySelector('#star-partners + ul img');
-    rows.push([fourStarPartnersImage]);
+  headings.forEach((heading) => {
+    content.push(createCell(heading.cloneNode(true))); // Clone node for dynamic content extraction
+  });
 
-    // 3 Star Partners Section
-    const threeStarPartnersHeader = ['3 Star Partners'];
-    rows.push(threeStarPartnersHeader);
+  // Create header row that matches the example exactly
+  const headerRow = ['Columns'];
 
-    const threeStarPartnersDescription = element.querySelector('#star-partners-1 + ul');
-    rows.push([threeStarPartnersDescription]);
+  // Prepare rows for the table
+  const rows = [headerRow];
 
-    // 2 Star Partners Section
-    const twoStarPartnersHeader = ['2 Star Partners'];
-    rows.push(twoStarPartnersHeader);
+  if (content.length > 0) {
+    rows.push(content); // Add extracted content only if available
+  } else {
+    rows.push(['']); // Handle edge case of empty content
+  }
 
-    const twoStarPartnersImages = Array.from(element.querySelectorAll('#star-partners-2 + ul img'));
-    twoStarPartnersImages.forEach((img) => rows.push([img]));
+  // Create the table using the WebImporter helper function
+  const table = WebImporter.DOMUtils.createTable(rows, document);
 
-    // 1 Star Partners Section
-    const oneStarPartnersHeader = ['1 Star Partners'];
-    rows.push(oneStarPartnersHeader);
-
-    const oneStarPartnersItems = Array.from(element.querySelectorAll('#star-partners-3 + ul li')).map(item => item.textContent);
-    rows.push([oneStarPartnersItems.join(' ')]); // Combine all items into plain text within a single cell
-
-    // Become a Partner Section
-    const becomePartnerHeader = ['Become a Partner'];
-    rows.push(becomePartnerHeader);
-
-    const becomePartnerDescription = element.querySelector('#become-a-birdies-for-the-brave-partner + p');
-    rows.push([becomePartnerDescription]);
-
-    // Generate table
-    const table = WebImporter.DOMUtils.createTable(rows, document);
-
-    // Replace the original element with the new table
-    element.replaceWith(table);
+  // Replace the original element
+  element.replaceWith(table);
 }

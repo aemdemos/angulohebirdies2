@@ -1,42 +1,50 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Create header row that precisely matches the example
   const headerRow = ['Columns'];
 
-  // Extract image
-  const img = element.querySelector('img');
-  let imgElement = null;
-  if (img) {
-    imgElement = document.createElement('img');
-    imgElement.src = img.src;
-    imgElement.alt = img.alt;
-  }
+  const imageWrapper = element.querySelector('picture img');
+  const image = document.createElement('img');
+  image.src = imageWrapper?.src;
+  image.alt = imageWrapper?.alt || '';
 
-  // Extract list content from <ul>
-  const listItems = [...element.querySelectorAll('ul li')].map((li) => li.textContent.trim());
-  const listContent = document.createElement('ul');
-  listItems.forEach((item) => {
-    const li = document.createElement('li');
-    li.textContent = item;
-    listContent.appendChild(li);
+  const heading = element.querySelector('h2')?.textContent.trim() || '';
+  const paragraphs = [...element.querySelectorAll('p')].map(p => p.textContent.trim()).join(' ');
+
+  const links = [...element.querySelectorAll('a')].map(link => {
+    const a = document.createElement('a');
+    a.href = link.href;
+    a.textContent = link.title || link.textContent;
+    return a;
   });
 
-  // Extract paragraphs logically into another cell
-  const paragraphs = [...element.querySelectorAll('p')].map((p) => {
-    const div = document.createElement('div');
-    div.textContent = p.textContent.trim();
-    return div;
+  const listItems = [...element.querySelectorAll('ul li')].map(listItem => listItem.textContent.trim());
+
+  const contentCell = document.createElement('div');
+  const headingNode = document.createElement('h2');
+  headingNode.textContent = heading;
+
+  const paragraphsNode = document.createElement('p');
+  paragraphsNode.textContent = paragraphs;
+
+  const listNode = document.createElement('ul');
+  listItems.forEach(item => {
+    const listItemNode = document.createElement('li');
+    listItemNode.textContent = item;
+    listNode.appendChild(listItemNode);
   });
 
-  // Combine extracted elements into table rows
+  contentCell.appendChild(headingNode);
+  contentCell.appendChild(image);
+  contentCell.appendChild(paragraphsNode);
+  contentCell.appendChild(listNode);
+  links.forEach(link => contentCell.appendChild(link));
+
   const cells = [
-    headerRow, // Header row as per example
-    [listContent, imgElement, paragraphs],
+    headerRow,
+    [contentCell]
   ];
 
-  // Create table using helper method
   const blockTable = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace original element with the new block table
   element.replaceWith(blockTable);
 }

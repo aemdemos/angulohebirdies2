@@ -1,33 +1,35 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-    const hr = document.createElement('hr');
-
-    // Correctly create the header row as per the example
     const headerRow = ['Columns'];
 
-    // Initialize table structure with the header
-    const columnsTable = [headerRow];
+    const contentRows = Array.from(element.querySelectorAll('.columns > div')).map((column) => {
+        const picture = column.querySelector('picture');
+        const textContainer = column.querySelector('div:last-of-type');
+        const textContent = textContainer ? textContainer.textContent.trim() : '';
 
-    // Extract rows dynamically from the element
-    const rows = Array.from(element.querySelectorAll('.columns > div')).map((block) => {
-        // Extract image element
-        const image = block.querySelector('picture img');
-        const imageElement = image ? image.cloneNode(true) : document.createTextNode('No Image Available');
+        let cellContent = [];
+        if (picture) {
+            const img = picture.querySelector('img');
+            if (img) {
+                const imageElement = document.createElement('img');
+                imageElement.src = img.src;
+                imageElement.alt = img.alt || '';
+                imageElement.width = img.width;
+                imageElement.height = img.height;
+                cellContent.push(imageElement);
+            }
+        }
 
-        // Extract text content
-        const textContent = block.querySelector('div:last-child');
-        const contentElement = textContent ? textContent.cloneNode(true) : document.createTextNode('No Content Available');
+        if (textContent) {
+            const textElement = document.createElement('div');
+            textElement.textContent = textContent;
+            cellContent.push(textElement);
+        }
 
-        // Ensure both cells in the row have valid content
-        return [imageElement, contentElement];
+        return cellContent.length > 0 ? cellContent : [''];
     });
 
-    // Add extracted rows to the table
-    columnsTable.push(...rows);
-
-    // Create the block table using WebImporter.DOMUtils.createTable
-    const columnsBlock = WebImporter.DOMUtils.createTable(columnsTable, document);
-
-    // Replace original element with the new structure
-    element.replaceWith(hr, columnsBlock);
+    const tableData = [headerRow, ...contentRows];
+    const table = WebImporter.DOMUtils.createTable(tableData, document);
+    element.replaceWith(table);
 }

@@ -1,47 +1,45 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const headerRow = ['Columns'];
-
-  // Safely extract navigation links
-  const navSections = element.querySelector('.nav-sections ul');
-  const navLinks = navSections ? Array.from(navSections.querySelectorAll('a')).map(link => {
-    const a = document.createElement('a');
-    a.href = link.href;
-    a.textContent = link.textContent || 'Unnamed link';
-    return a;
-  }) : ['No navigation available'];
-
-  // Safely extract donate button
-  const navTools = element.querySelector('.nav-tools .button-container a');
-  const donateButton = navTools ? document.createElement('a') : document.createTextNode('No donate button available');
-  if (navTools) {
-    donateButton.href = navTools.href;
-    donateButton.textContent = navTools.textContent || 'Donate';
+  // Validate the input
+  if (!element || !document) {
+    console.error('Invalid input: element or document is missing');
+    return;
   }
 
-  // Safely extract images
-  const images = Array.from(element.querySelectorAll('picture img')).map(img => {
-    const image = document.createElement('img');
-    image.src = img.src;
-    image.alt = img.alt || 'Image';
-    image.width = img.width;
-    image.height = img.height;
-    return image;
-  });
+  // Extract content dynamically and guard against null cases
+  const navBrand = element.querySelector('.nav-brand a');
+  const navLogo = navBrand && navBrand.querySelector('img') ? navBrand.querySelector('img') : null;
+  const navSectionsContainer = element.querySelector('.nav-sections');
+  const navSections = navSectionsContainer ? Array.from(navSectionsContainer.querySelectorAll('li a')) : [];
+  const navTools = element.querySelector('.nav-tools .button-container a') || null;
 
-  const imageCell1 = images[0] || document.createTextNode('No image available');
-  const imageCell2 = images[1] || document.createTextNode('No image available');
+  // Ensure all extracted elements exist
+  if (!navBrand || !navLogo || navSections.length === 0 || !navTools) {
+    console.error('Missing required content in the provided HTML element');
+    return;
+  }
 
-  // Organize into the table array
-  const cells = [
-    headerRow,
-    [imageCell1, navLinks],
-    [imageCell2, donateButton]
+  // Create the table structure dynamically
+  const headerRow = ['Columns']; // Block header matches the example exactly
+
+  const contentRow1 = [
+    ['Columns block', ...navSections],
+    [navLogo]
   ];
 
-  // Create the block table
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  const contentRow2 = [
+    [navTools]
+  ];
 
-  // Replace the original element with the new block table
-  element.replaceWith(block);
+  const tableStructure = [
+    headerRow,
+    contentRow1,
+    contentRow2
+  ];
+
+  // Create the block table using WebImporter helper
+  const blockTable = WebImporter.DOMUtils.createTable(tableStructure, document);
+
+  // Replace the provided element with the newly created block
+  element.replaceWith(blockTable);
 }
