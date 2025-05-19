@@ -11,7 +11,32 @@
  */
 /* global WebImporter */
 /* eslint-disable no-console */
-
+import hero8Parser from './parsers/hero8.js';
+import hero2Parser from './parsers/hero2.js';
+import embedVideo3Parser from './parsers/embedVideo3.js';
+import columns5Parser from './parsers/columns5.js';
+import columns16Parser from './parsers/columns16.js';
+import columns7Parser from './parsers/columns7.js';
+import hero6Parser from './parsers/hero6.js';
+import columns14Parser from './parsers/columns14.js';
+import columns19Parser from './parsers/columns19.js';
+import columns13Parser from './parsers/columns13.js';
+import embedVideo10Parser from './parsers/embedVideo10.js';
+import columns11Parser from './parsers/columns11.js';
+import columns27Parser from './parsers/columns27.js';
+import carousel22Parser from './parsers/carousel22.js';
+import embedVideo29Parser from './parsers/embedVideo29.js';
+import columns23Parser from './parsers/columns23.js';
+import video32Parser from './parsers/video32.js';
+import columns4Parser from './parsers/columns4.js';
+import columns20Parser from './parsers/columns20.js';
+import columns24Parser from './parsers/columns24.js';
+import columns18Parser from './parsers/columns18.js';
+import columns15Parser from './parsers/columns15.js';
+import columns17Parser from './parsers/columns17.js';
+import carousel30Parser from './parsers/carousel30.js';
+import columns31Parser from './parsers/columns31.js';
+import columns28Parser from './parsers/columns28.js';
 import headerParser from './parsers/header.js';
 import metadataParser from './parsers/metadata.js';
 import cleanupTransformer from './transformers/cleanup.js';
@@ -26,7 +51,32 @@ import {
 
 const parsers = {
   metadata: metadataParser,
-
+  hero8: hero8Parser,
+  hero2: hero2Parser,
+  embedVideo3: embedVideo3Parser,
+  columns5: columns5Parser,
+  columns16: columns16Parser,
+  columns7: columns7Parser,
+  hero6: hero6Parser,
+  columns14: columns14Parser,
+  columns19: columns19Parser,
+  columns13: columns13Parser,
+  embedVideo10: embedVideo10Parser,
+  columns11: columns11Parser,
+  columns27: columns27Parser,
+  carousel22: carousel22Parser,
+  embedVideo29: embedVideo29Parser,
+  columns23: columns23Parser,
+  video32: video32Parser,
+  columns4: columns4Parser,
+  columns20: columns20Parser,
+  columns24: columns24Parser,
+  columns18: columns18Parser,
+  columns15: columns15Parser,
+  columns17: columns17Parser,
+  carousel30: carousel30Parser,
+  columns31: columns31Parser,
+  columns28: columns28Parser,
 };
 
 const transformers = {
