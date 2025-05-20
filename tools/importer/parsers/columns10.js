@@ -1,38 +1,52 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const hr = document.createElement('hr');
+  // Extract Section Header
+  const header = element.querySelector('h2')?.textContent.trim() || '';
 
-  const sectionMetadataTable = WebImporter.DOMUtils.createTable(
-    [
-      ['Section Metadata'],
-      ['tournament-container'],
-    ],
-    document
-  );
+  // Extract Paragraphs and Group into One Cell
+  const paragraphs = Array.from(element.querySelectorAll('p')).map(p => {
+    return p.cloneNode(true);
+  });
+  const combinedParagraphsCell = document.createElement('div');
+  combinedParagraphsCell.append(...paragraphs);
 
+  // Extract Cards
+  const cards = Array.from(element.querySelectorAll('.cards li')).map(card => {
+    const titleElement = card.querySelector('.cards-card-body strong a');
+    const title = titleElement?.textContent.trim() || '';
+
+    const imgElement = card.querySelector('img');
+    const img = imgElement
+      ? (() => {
+          const imgTag = document.createElement('img');
+          imgTag.setAttribute('src', imgElement.src);
+          imgTag.setAttribute('alt', imgElement.alt || '');
+          return imgTag;
+        })()
+      : '';
+
+    const linkElement = card.querySelector('a.callout-overlay-button');
+    const link = linkElement
+      ? (() => {
+          const linkTag = document.createElement('a');
+          linkTag.setAttribute('href', linkElement.href);
+          linkTag.textContent = linkElement.textContent.trim();
+          return linkTag;
+        })()
+      : '';
+
+    return [title, img, link];
+  });
+
+  // Create Table Structure
   const headerRow = ['Columns'];
-
-  const blockContentRows = [
-    [
-      document.createTextNode('Columns block\n- One\n- Two\n- Three'),
-      (() => {
-        const image = document.createElement('img');
-        image.src = 'https://main--sta-boilerplate--aemdemos.hlx.page/media_193050d52a802830d970fde49644ae9a504a61b7f.png#width=750&height=500';
-        return image;
-      })(),
-    ],
-    [
-      (() => {
-        const image = document.createElement('img');
-        image.src = 'https://main--sta-boilerplate--aemdemos.hlx.page/media_1e562f39bbce4d269e279cbbf8c5674a399fe0070.png#width=644&height=470';
-        return image;
-      })(),
-      document.createTextNode('Or you can just view the preview\n\nPreview'),
-    ],
+  const contentRows = [
+    [header, combinedParagraphsCell],
+    ...cards.map(row => row.filter(cell => cell !== '')),
   ];
 
-  const tableStructure = [headerRow, ...blockContentRows];
-  const blockTable = WebImporter.DOMUtils.createTable(tableStructure, document);
+  const blockTable = WebImporter.DOMUtils.createTable([headerRow, ...contentRows], document);
 
-  element.replaceWith(hr, sectionMetadataTable, blockTable);
+  // Replace Original Element
+  element.replaceWith(blockTable);
 }

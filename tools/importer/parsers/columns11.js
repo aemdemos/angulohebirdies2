@@ -1,44 +1,38 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const columnsBlockHeader = ['Columns'];
+  // Helper to create an image element
+  const createImageElement = (img) => {
+    const image = document.createElement('img');
+    image.src = img.src;
+    image.alt = img.alt || '';
+    image.width = img.width || '';
+    image.height = img.height || '';
+    return image;
+  };
 
-  // Parse content within the element
-  const defaultContentWrapper = element.querySelector('.default-content-wrapper');
-  const title = defaultContentWrapper.querySelector('h2');
-  const paragraphs = defaultContentWrapper.querySelectorAll('p');
+  // Extract relevant content from the element
+  const header = element.querySelector('h2');
+  const paragraph = element.querySelector('p');
+  const image = element.querySelector('picture img');
 
-  const tournamentWrapper = element.querySelector('.tournament-wrapper');
-  const tournamentBlocks = tournamentWrapper.querySelectorAll('.tournament > div');
+  // Create the header row
+  const headerRow = ['Columns'];
 
-  // Extract image
-  const imageElement = paragraphs[0].querySelector('img');
+  // Combine the content pieces (header and paragraph) into a single cell
+  const contentCell = document.createElement('div');
+  if (header) contentCell.appendChild(header);
+  if (paragraph) contentCell.appendChild(paragraph);
 
-  // First column content
-  const firstColumnContent = document.createElement('div');
-  firstColumnContent.innerHTML = `<strong>${title.textContent}</strong>`;
-  paragraphs.forEach((p, index) => {
-    if (index > 0) {
-      firstColumnContent.appendChild(p.cloneNode(true));
-    }
-  });
-
-  // Tournament content for second column
-  const secondColumnContent = document.createElement('div');
-  tournamentBlocks.forEach((block) => {
-    block.childNodes.forEach((child) => {
-      secondColumnContent.appendChild(child.cloneNode(true));
-    });
-  });
-
-  // Create a table block
+  // Create the table structure
   const cells = [
-    columnsBlockHeader,
-    [firstColumnContent, imageElement],
-    [secondColumnContent],
+    headerRow,
+    [contentCell],
+    [createImageElement(image)],
   ];
 
-  const blockTable = WebImporter.DOMUtils.createTable(cells, document);
+  // Generate the block table using createTable function
+  const block = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace original element
-  element.replaceWith(blockTable);
+  // Replace the original element with the new block table
+  element.replaceWith(block);
 }
