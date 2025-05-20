@@ -1,41 +1,44 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-    const sectionBreak = document.createElement('hr');
+  const cells = [];
 
-    // Extract image
-    const imageElement = element.querySelector('picture img');
-    const image = imageElement ? imageElement.cloneNode(true) : null;
+  // Add the header row dynamically based on the example
+  cells.push(['Columns']);
 
-    // Extract links from list
-    const list = element.querySelectorAll('ul li a');
-    const links = Array.from(list).map(link => link.cloneNode(true));
+  // Extract card details dynamically
+  const cards = element.querySelectorAll('.cards-card-body');
+  const images = element.querySelectorAll('.cards-card-image img');
 
-    // Extract mail and copyright details
-    const copyrightElement = element.querySelector('p a[href^="mailto"]');
-    const copyrightTextElement = element.querySelector('p');
-    const copyrightText = copyrightTextElement ? copyrightTextElement.textContent.trim() : '';
+  const cardData = Array.from(cards).map((card, index) => {
+    const titleLink = card.querySelector('h3 a');
+    const titleText = titleLink ? titleLink.textContent.trim() : '';
+    const description = card.querySelector('p') ? card.querySelector('p').textContent.trim() : '';
+    const image = images[index];
 
-    // Extract social media links
-    const socialMediaList = element.querySelectorAll('ul:last-of-type li a');
-    const socialMediaLinks = Array.from(socialMediaList).map(link => link.cloneNode(true));
+    const imageElement = document.createElement('img');
+    if (image) {
+      imageElement.src = image.src;
+      imageElement.alt = image.alt;
+    }
 
-    // Create table rows
-    const headerRow = ['Columns']; // Header row matching example exactly
-    const firstRow = image ? [image] : [document.createTextNode('Image not found')];
-    const secondRow = links.map(link => [link]);
-    const thirdRow = copyrightElement ? [[copyrightElement, document.createTextNode(copyrightText)]] : [[document.createTextNode('Copyright details not found')]];
-    const fourthRow = socialMediaLinks.length > 0 ? socialMediaLinks.map(link => [link]) : [[document.createTextNode('Social media links not found')]];
+    const titleElement = document.createElement('a');
+    if (titleLink) {
+      titleElement.href = titleLink.href;
+      titleElement.textContent = titleText;
+    }
 
-    // Generate table using WebImporter
-    const tableData = [
-        headerRow,
-        ...firstRow,
-        ...secondRow,
-        ...thirdRow,
-        ...fourthRow
-    ];
-    const table = WebImporter.DOMUtils.createTable(tableData, document);
+    const content = document.createElement('div');
+    content.append(titleElement, document.createElement('br'), description);
 
-    // Replace element
-    element.replaceWith(sectionBreak, table);
+    return [imageElement, content];
+  });
+
+  // Ensure card data is added dynamically
+  cells.push(...cardData);
+
+  // Create the final block table
+  const table = WebImporter.DOMUtils.createTable(cells, document);
+
+  // Replace original element with the block table
+  element.replaceWith(table);
 }
