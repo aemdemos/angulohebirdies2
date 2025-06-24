@@ -1,19 +1,47 @@
+/*
+ * .hero-container .hero-wrapper comes first to avoid specificity issues
+ */
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
 }
 
-.hero {
-  position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+.hero-container > .hero-wrapper {
+  max-width: unset;
+  padding: 0;
+  margin: 0;
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+.hero {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  min-height: 200px;
+  background: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.hero > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero picture,
+.hero img {
+  display: block;
+  width: 100vw;
+  min-width: 100vw;
+  max-width: 100vw;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .hero picture {
@@ -24,14 +52,145 @@
   box-sizing: border-box;
 }
 
-.hero img {
-  object-fit: cover;
+.hero h1 {
+  max-width: 1200px;
+  color: var(--background-color);
+  background: none;
+  font-family: var(--heading-font-family);
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  line-height: 1.12;
+  text-align: left;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero > div > div {
+  position: absolute;
+  left: 0;
+  bottom: 19%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: rgb(255 255 255 / 80%);
+  padding: 3.1rem 1.7rem 3.1rem 2.5rem;
+  width: fit-content;
+  min-width: 0;
+  max-width: 95vw;
+  box-sizing: border-box;
+  z-index: 2;
+  border-radius: 0;
+}
+
+/*
+ * .hero.hero3 block after .hero rules for specificity
+ */
+.hero.hero3 {
+  position: relative;
+  min-height: 320px;
+  display: block;
+  align-items: center;
+  justify-content: stretch;
+  padding: 0;
+  background-image: url('./media_1ce0ba42598ad7ea4f9ea6a72a9157201f1b7c3f6.png?width=2000&format=png&optimize=medium');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
+  margin: 0;
+}
+
+.hero.hero3 picture {
+  display: none;
+}
+
+.hero.hero3 > div {
   width: 100%;
   height: 100%;
+  display: block;
+  position: static;
+  align-items: unset;
+  justify-content: unset;
+}
+
+.hero.hero3 > div > div {
+  position: absolute;
+  inset: auto auto 13% 0;
+  width: 55%;
+  height: 90px;
+  background: rgb(242 242 242 / 95%);
+  padding: 0 1.2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 2;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0;
+}
+
+.hero.hero3 h1 {
+  background: none;
+  color: #1773BA;
+  font-family: Arial Narrow, sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  text-align: left;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  align-self: center;
 }
 
 @media (width >= 900px) {
   .hero {
     padding: 40px 32px;
+  }
+}
+
+@media (width <= 900px) {
+  .hero.hero3 {
+    min-height: 180px;
+  }
+
+  .hero.hero3 > div > div {
+    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: 3.5%;
+    height: 60px;
+    padding: 0 0.7rem;
+  }
+
+  .hero.hero3 h1 {
+    font-size: 2rem;
+  }
+
+  .hero > div > div {
+    bottom: 7%;
+    padding: 1.4rem 0.7rem 1.4rem 1rem;
+    width: 97vw;
+    max-width: 100vw;
+  }
+
+  .hero h1 {
+    font-size: 1.3rem;
+    white-space: normal;
   }
 }
