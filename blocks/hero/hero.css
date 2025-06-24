@@ -1,3 +1,4 @@
+
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
@@ -33,5 +34,78 @@
 @media (width >= 900px) {
   .hero {
     padding: 40px 32px;
+  }
+}
+
+/* ====== Generated CSS (Only .hero.hero3 replaced with merged version) ====== */
+
+/* Merged .hero.hero3 */
+.hero.hero3 {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 320px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  background-image: url('./media_1ce0ba42598ad7ea4f9ea6a72a9157201f1b7c3f6.png?width=2000&format=png&optimize=medium');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* ====== rest of Generated CSS ====== */
+
+.hero.hero3 picture,
+.hero.hero3 p {
+  display: none;
+}
+
+.hero.hero3 > div {
+  flex: 1 0 0%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  min-height: 320px;
+}
+
+.hero.hero3 > div > div {
+  background: rgb(240 240 240 / 96.5%);
+  max-width: 32vw;
+  min-width: 325px;
+  padding: 3.1rem 2.8rem;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.hero.hero3 h1 {
+  color: #1871b7;
+  font-size: 2.95rem;
+  font-family: var(--heading-font-family), Arial, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.07;
+  letter-spacing: 1.5px;
+  text-align: left;
+  max-width: none;
+}
+
+@media (width <= 900px) {
+  .hero.hero3 > div > div {
+    max-width: 98vw;
+    min-width: unset;
+    padding: 1.2rem 0.8rem;
+  }
+
+  .hero.hero3 h1 {
+    font-size: 1.4rem;
   }
 }
