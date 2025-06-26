@@ -1,3 +1,4 @@
+
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
@@ -33,5 +34,102 @@
 @media (width >= 900px) {
   .hero {
     padding: 40px 32px;
+  }
+}
+
+.hero-container > .hero-wrapper {
+  max-width: unset;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+}
+
+/* MERGED .hero.hero3 BLOCK START */
+.hero.hero3 {
+  position: relative;
+  width: 100vw;
+  min-height: 320px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+
+/* MERGED .hero.hero3 BLOCK END */
+
+.hero.hero3 picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  display: block;
+}
+
+.hero.hero3 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Flex layout for the overlay zone */
+.hero.hero3 > div {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-start;
+  pointer-events: none;
+}
+
+/* Target the direct div that wraps the h1 */
+.hero.hero3 > div > div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Headline Overlay -- now anchored bottom left */
+.hero.hero3 h1 {
+  pointer-events: auto;
+  background: rgb(255 255 255 / 90%);
+  color: #1976d2;
+  font-family: var(--heading-font-family);
+  font-size: 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: 1px;
+  padding: 2rem 3rem;
+  margin: 0 0 2.5rem 2.5vw;
+  display: inline-block;
+  max-width: 67vw;
+  box-sizing: border-box;
+  border-radius: 0;
+  align-self: flex-end;
+  z-index: 3;
+}
+
+.hero.hero3 p {
+  margin: 0;
+  padding: 0;
+}
+
+@media (width <= 900px) {
+  .hero.hero3 h1 {
+    font-size: 2rem;
+    padding: 1rem 1.2rem;
+    max-width: 95vw;
+    margin-bottom: 2vw;
+    margin-left: 2vw;
   }
 }
