@@ -1,38 +1,33 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const headerRow = ['Columns'];
+  // Find the .columns.block inside the wrapper
+  const columnsBlock = element.querySelector('.columns.block');
+  if (!columnsBlock) return;
 
-  // Extract columns content
-  const columnsContent = [];
-  const columnElements = element.querySelectorAll('.columns > div');
+  // Get all direct child column divs
+  const columnDivs = Array.from(columnsBlock.children).filter(d => d.tagName === 'DIV');
+  if (columnDivs.length === 0) return;
 
-  columnElements.forEach((column) => {
-    // Extract text content
-    const textElement = column.querySelector('div:last-child');
-    const textContent = textElement ? textElement.cloneNode(true) : document.createTextNode('No content available');
-
-    // Extract image
-    const pictureElement = column.querySelector('picture');
-    const imageElement = pictureElement ? pictureElement.querySelector('img') : null;
-    const imageContent = imageElement ? document.createElement('img') : null;
-
-    if (imageElement) {
-      imageContent.src = imageElement.src;
-      imageContent.alt = imageElement.alt;
-    }
-
-    // Ensure proper structure: separate text and image into different cells
-    columnsContent.push([textContent, imageContent || document.createTextNode('')]);
-  });
-
-  // Create table data
-  const cells = [
-    headerRow,
-    ...columnsContent.map((content) => content),
+  // Split columns into two groups for two columns, as in the example
+  const half = Math.ceil(columnDivs.length / 2);
+  const groups = [
+    columnDivs.slice(0, half),
+    columnDivs.slice(half)
   ];
 
-  const table = WebImporter.DOMUtils.createTable(cells, document);
+  // Create a wrapper for each group and append the original elements
+  const cells = groups.map(group => {
+    const wrapper = document.createElement('div');
+    group.forEach(item => wrapper.appendChild(item));
+    return wrapper;
+  });
 
-  // Replace the original element
+  // Create table: first row is header, second row is two columns
+  const tableRows = [
+    ['Columns (columns6)'],
+    cells
+  ];
+
+  const table = WebImporter.DOMUtils.createTable(tableRows, document);
   element.replaceWith(table);
 }

@@ -93,15 +93,22 @@ export async function handleOnLoad({ document }) {
  * @param {string} url
  * @returns {string}
 */
-export function generateDocumentPath({ url }) {
-  let p = new URL(url).pathname;
-  if (p.endsWith('/')) {
-    p = `${p}index`;
+export function generateDocumentPath({ params: { originalURL } }, inventory) {
+  let p;
+  const urlEntry = inventory.urls?.find(({ url }) => url === originalURL);
+  if (urlEntry?.targetPath) {
+    p = urlEntry.targetPath === '/' ? '/index' : urlEntry.targetPath;
+  } else {
+    // fallback to original URL pathname
+    p = new URL(originalURL).pathname;
+    if (p.endsWith('/')) {
+      p = `${p}index`;
+    }
+    p = decodeURIComponent(p)
+      .toLowerCase()
+      .replace(/\.html$/, '')
+      .replace(/[^a-z0-9/]/gm, '-');
   }
-  p = decodeURIComponent(p)
-    .toLowerCase()
-    .replace(/\.html$/, '')
-    .replace(/[^a-z0-9/]/gm, '-');
   return WebImporter.FileUtils.sanitizePath(p);
 }
 
@@ -132,8 +139,8 @@ export const TableBuilder = (originalFunc) => {
         } else if (current?.toLowerCase().includes('metadata')) {
           return original(cells, document); // skip the rest
         }
-        const variantMatch = current.match(/\(([^)]+)\)/);
 
+        const variantMatch = current.match(/\(([^)]+)\)/);
         if (variantMatch) {
           const existingVariants = variantMatch[1].split(',').map((v) => v.trim());
           if (!existingVariants.includes(parserName)) {
@@ -152,3 +159,56 @@ export const TableBuilder = (originalFunc) => {
     restore: () => original,
   };
 };
+
+function reduceInstances(instances = []) {
+  return instances.map(({ urlHash, xpath, uuid }) => ({
+    urlHash,
+    xpath,
+    uuid,
+  }));
+}
+
+/**
+ * Merges site-urls into inventory with an optimized format
+ * @param {Object} siteUrls - The contents of site-urls.json
+ * @param {Object} inventory - The contents of inventory.json
+ * @param {string} publishUrl - The publish URL to use if targetUrl is not provided
+ * @returns {Object} The merged inventory data in the new format
+ */
+export function mergeInventory(siteUrls, inventory, publishUrl) {
+  // Extract originUrl and targetUrl from siteUrls
+  const { originUrl, targetUrl } = siteUrls;
+
+  // Transform URLs array to filter out excluded URLs and remove source property
+  const urls = siteUrls.urls
+    .filter(({ status }) => status !== 'EXCLUDED')
+    .map(({ url, targetPath, id }) => ({
+      url,
+      targetPath,
+      id,
+    }));
+
+  // Transform fragments to use simplified instance format
+  const fragments = inventory.fragments.map((fragment) => ({
+    ...fragment,
+    instances: reduceInstances(fragment.instances),
+  }));
+
+  // Transform blocks to use simplified instance format
+  const blocks = inventory.blocks.map((block) => ({
+    ...block,
+    instances: reduceInstances(block.instances),
+  }));
+
+  // Transform outliers to use simplified instance format
+  const outliers = reduceInstances(inventory.outliers);
+
+  return {
+    originUrl,
+    targetUrl: targetUrl || publishUrl,
+    urls,
+    fragments,
+    blocks,
+    outliers,
+  };
+}

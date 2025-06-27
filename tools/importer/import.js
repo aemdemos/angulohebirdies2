@@ -11,17 +11,17 @@
  */
 /* global WebImporter */
 /* eslint-disable no-console */
-import hero4Parser from './parsers/hero4.js';
-import hero3Parser from './parsers/hero3.js';
-import carousel8Parser from './parsers/carousel8.js';
-import carousel12Parser from './parsers/carousel12.js';
-import cards7Parser from './parsers/cards7.js';
-import columns6Parser from './parsers/columns6.js';
-import columns2Parser from './parsers/columns2.js';
-import columns10Parser from './parsers/columns10.js';
 import columns11Parser from './parsers/columns11.js';
-import columns5Parser from './parsers/columns5.js';
+import hero4Parser from './parsers/hero4.js';
+import columns10Parser from './parsers/columns10.js';
+import carousel8Parser from './parsers/carousel8.js';
+import hero3Parser from './parsers/hero3.js';
+import cards7Parser from './parsers/cards7.js';
+import columns2Parser from './parsers/columns2.js';
 import columns9Parser from './parsers/columns9.js';
+import columns6Parser from './parsers/columns6.js';
+import carousel12Parser from './parsers/carousel12.js';
+import columns5Parser from './parsers/columns5.js';
 import headerParser from './parsers/header.js';
 import metadataParser from './parsers/metadata.js';
 import cleanupTransformer from './transformers/cleanup.js';
@@ -32,21 +32,22 @@ import {
   generateDocumentPath,
   handleOnLoad,
   TableBuilder,
+  mergeInventory,
 } from './import.utils.js';
 
 const parsers = {
   metadata: metadataParser,
-  hero4: hero4Parser,
-  hero3: hero3Parser,
-  carousel8: carousel8Parser,
-  carousel12: carousel12Parser,
-  cards7: cards7Parser,
-  columns6: columns6Parser,
-  columns2: columns2Parser,
-  columns10: columns10Parser,
   columns11: columns11Parser,
-  columns5: columns5Parser,
+  hero4: hero4Parser,
+  columns10: columns10Parser,
+  carousel8: carousel8Parser,
+  hero3: hero3Parser,
+  cards7: cards7Parser,
+  columns2: columns2Parser,
   columns9: columns9Parser,
+  columns6: columns6Parser,
+  carousel12: carousel12Parser,
+  columns5: columns5Parser,
 };
 
 const transformers = {
@@ -56,23 +57,16 @@ const transformers = {
 };
 
 WebImporter.Import = {
+  findSiteUrl: (instance, siteUrls) => (
+    siteUrls.find(({ id }) => id === instance.urlHash)
+  ),
   transform: (hookName, element, payload) => {
     // perform any additional transformations to the page
     Object.entries(transformers).forEach(([, transformerFn]) => (
       transformerFn.call(this, hookName, element, payload)
     ));
   },
-  getParserName: ({ name, cluster }) => {
-    // Remove invalid filename characters
-    let sanitizedString = name.replace(/[^a-zA-Z0-9-_\s]/g, ' ').trim();
-    // Remove all numbers at the beginning of the string
-    sanitizedString = sanitizedString.replace(/^\d+/, '');
-    // Convert to camel case
-    sanitizedString = sanitizedString
-      .replace(/[\s-_]+(.)?/g, (match, chr) => (chr ? chr.toUpperCase() : ''))
-      .replace(/^\w/, (c) => c.toLowerCase());
-    return cluster ? `${sanitizedString}${cluster}` : sanitizedString;
-  },
+  getParserName: ({ name, key }) => key || name,
   getElementByXPath: (document, xpath) => {
     const result = document.evaluate(
       xpath,
@@ -83,33 +77,39 @@ WebImporter.Import = {
     );
     return result.singleNodeValue;
   },
-  getFragmentXPaths: (fragments = [], url = '') => (fragments.flatMap(({ instances = [] }) => instances)
-    .filter((instance) => instance.url === url)
+  getFragmentXPaths: (
+    { urls = [], fragments = [] },
+    sourceUrl = '',
+  ) => (fragments.flatMap(({ instances = [] }) => instances)
+    .filter((instance) => {
+      // find url in urls array
+      const siteUrl = WebImporter.Import.findSiteUrl(instance, urls);
+      if (!siteUrl) {
+        return false;
+      }
+      return siteUrl.url === sourceUrl;
+    })
     .map(({ xpath }) => xpath)),
 };
 
-const pageElements = [
-  {
-    name: 'metadata',
-  },
-];
+const pageElements = [{ name: 'metadata' }];
 
 /**
 * Page transformation function
 */
 function transformPage(main, { inventory, ...source }) {
-  const { fragments = [], blocks: inventoryBlocks = [] } = inventory;
+  const { urls = [], blocks: inventoryBlocks = [] } = inventory;
   const { document, params: { originalURL } } = source;
 
   // get fragment elements from the current page
-  const fragmentElements = WebImporter.Import.getFragmentXPaths(fragments, originalURL)
+  const fragmentElements = WebImporter.Import.getFragmentXPaths(inventory, originalURL)
     .map((xpath) => WebImporter.Import.getElementByXPath(document, xpath))
     .filter((el) => el);
 
   // get dom elements for each block on the current page
   const blockElements = inventoryBlocks
     .flatMap((block) => block.instances
-      .filter((instance) => instance.url === originalURL)
+      .filter((instance) => WebImporter.Import.findSiteUrl(instance, urls)?.url === originalURL)
       .map((instance) => ({
         ...block,
         element: WebImporter.Import.getElementByXPath(document, instance.xpath),
@@ -126,23 +126,23 @@ function transformPage(main, { inventory, ...source }) {
   // before page transform hook
   WebImporter.Import.transform(TransformHook.beforePageTransform, main, { ...source });
 
+  const tableBuilder = TableBuilder(WebImporter.DOMUtils.createTable);
   // transform all block elements using parsers
-  [...pageElements, ...blockElements].forEach(({ name, cluster, element = main }) => {
-    const parserName = WebImporter.Import.getParserName({ name, cluster });
+  [...pageElements, ...blockElements].forEach(({ element = main, ...pageBlock }) => {
+    const parserName = WebImporter.Import.getParserName(pageBlock);
     const parserFn = parsers[parserName];
     if (!parserFn) return;
     try {
       // before parse hook
       WebImporter.Import.transform(TransformHook.beforeParse, element, { ...source });
-      const tableBuilder = TableBuilder(WebImporter.DOMUtils.createTable);
-      WebImporter.DOMUtils.createTable = tableBuilder.build(parserName);
       // parse the element
+      WebImporter.DOMUtils.createTable = tableBuilder.build(parserName);
       parserFn.call(this, element, { ...source });
       WebImporter.DOMUtils.createTable = tableBuilder.restore();
       // after parse hook
       WebImporter.Import.transform(TransformHook.afterParse, element, { ...source });
     } catch (e) {
-      console.warn(`Failed to parse block: ${name} from cluster: ${cluster}`, e);
+      console.warn(`Failed to parse block: ${pageBlock.key}`, e);
     }
   });
 }
@@ -183,8 +183,16 @@ function transformFragment(main, { fragment, inventory, ...source }) {
       console.warn('Failed to parse header block', e);
     }
   } else {
+    const tableBuilder = TableBuilder(WebImporter.DOMUtils.createTable);
+
     (fragment.instances || [])
-      .filter(({ url }) => `${url}#${fragment.name}` === originalURL)
+      .filter((instance) => {
+        const siteUrl = WebImporter.Import.findSiteUrl(instance, inventory.urls);
+        if (!siteUrl) {
+          return false;
+        }
+        return `${siteUrl.url}#${fragment.name}` === originalURL;
+      })
       .map(({ xpath }) => ({
         xpath,
         element: WebImporter.Import.getElementByXPath(document, xpath),
@@ -194,21 +202,21 @@ function transformFragment(main, { fragment, inventory, ...source }) {
         main.append(element);
 
         const fragmentBlock = inventory.blocks
-          .find(
-            ({ instances }) => instances
-              .find(({ url, xpath: blockXpath }) => `${url}#${fragment.name}` === originalURL && blockXpath === xpath),
-          );
+          .find(({ instances }) => instances.find((instance) => {
+            const siteUrl = WebImporter.Import.findSiteUrl(instance, inventory.urls);
+            return `${siteUrl.url}#${fragment.name}` === originalURL && instance.xpath === xpath;
+          }));
 
         if (!fragmentBlock) return;
-        const { name, cluster } = fragmentBlock;
-        const parserName = WebImporter.Import.getParserName({ name, cluster });
+        const parserName = WebImporter.Import.getParserName(fragmentBlock);
         const parserFn = parsers[parserName];
         if (!parserFn) return;
-
         try {
+          WebImporter.DOMUtils.createTable = tableBuilder.build(parserName);
           parserFn.call(this, element, source);
+          WebImporter.DOMUtils.createTable = tableBuilder.restore();
         } catch (e) {
-          console.warn(`Failed to parse block: ${name} from cluster: ${cluster} with xpath: ${xpath}`, e);
+          console.warn(`Failed to parse block: ${fragmentBlock.key}, with xpath: ${xpath}`, e);
         }
       });
   }
@@ -233,13 +241,17 @@ export default {
     let inventory = null;
     // $$inventory = {{{inventory}}};
     if (!inventory) {
-      // fetch the inventory
+      const siteUrlsUrl = new URL('/tools/importer/site-urls.json', publishUrl);
       const inventoryUrl = new URL('/tools/importer/inventory.json', publishUrl);
       try {
+        // fetch and merge site-urls and inventory
+        const siteUrlsResp = await fetch(siteUrlsUrl.href);
         const inventoryResp = await fetch(inventoryUrl.href);
+        const siteUrls = await siteUrlsResp.json();
         inventory = await inventoryResp.json();
+        inventory = mergeInventory(siteUrls, inventory, publishUrl);
       } catch (e) {
-        console.error('Failed to fetch inventory');
+        console.error('Failed to merge site-urls and inventory');
       }
       if (!inventory) {
         return [];
@@ -249,7 +261,7 @@ export default {
     let main = document.body;
 
     // before transform hook
-    WebImporter.Import.transform(TransformHook.beforeTransform, main, { ...source, publishUrl });
+    WebImporter.Import.transform(TransformHook.beforeTransform, main, { ...source, inventory });
 
     // perform the transformation
     let path = null;
@@ -267,11 +279,11 @@ export default {
     } else {
       // page transformation
       transformPage(main, { ...source, inventory });
-      path = generateDocumentPath(source);
+      path = generateDocumentPath(source, inventory);
     }
 
     // after transform hook
-    WebImporter.Import.transform(TransformHook.afterTransform, main, { ...source, publishUrl });
+    WebImporter.Import.transform(TransformHook.afterTransform, main, { ...source, inventory });
 
     return [{
       element: main,

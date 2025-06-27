@@ -1,36 +1,33 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Ensure the header row matches the example exactly
-  const headerRow = ['Navigation'];
+  // Get the nav block inside the header
+  const nav = element.querySelector('nav');
+  if (!nav) return;
 
-  // Extract the image from the nav-brand
-  const img = element.querySelector('.nav-brand img');
+  // Get logo block (brand)
+  const brand = nav.querySelector('.nav-brand');
+  // Get navigation links (sections)
+  const navSections = nav.querySelector('.nav-sections');
+  // Get the donate button (tools)
+  const navTools = nav.querySelector('.nav-tools');
 
-  // Extract the navigation links
-  const navLinks = [...element.querySelectorAll('.nav-sections ul li a')].map((link) => {
-    const p = document.createElement('p');
-    p.appendChild(link.cloneNode(true));
-    return p;
-  });
+  // Compose left column: logo above nav links
+  const leftCol = document.createElement('div');
+  if (brand) leftCol.appendChild(brand);
+  if (navSections) leftCol.appendChild(navSections);
 
-  // Extract the donation link
-  const donateLink = element.querySelector('.nav-tools a');
-  const donateParagraph = document.createElement('p');
-  if (donateLink) {
-    donateParagraph.appendChild(donateLink.cloneNode(true));
-  }
+  // Compose right column: donate button
+  const rightCol = document.createElement('div');
+  if (navTools) rightCol.appendChild(navTools);
 
-  // Create the table structure with all extracted content
+  // Build the cells: header row has only ONE column, then 2-column content row
   const cells = [
-    headerRow,
-    [img ? img.cloneNode(true) : ''],
-    [navLinks.length > 0 ? navLinks : ''],
-    [donateLink ? donateParagraph : ''],
+    ['Columns (columns2)'],
+    [leftCol, rightCol]
   ];
 
-  // Create the block table using WebImporter.DOMUtils.createTable
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  const table = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace the original element with the new block table
-  element.replaceWith(block);
+  // Replace original element
+  element.replaceWith(table);
 }

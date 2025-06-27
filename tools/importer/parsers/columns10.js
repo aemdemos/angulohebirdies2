@@ -1,52 +1,29 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Extract Section Header
-  const header = element.querySelector('h2')?.textContent.trim() || '';
+  // Extract the left column: intro content
+  const contentWrapper = element.querySelector('.default-content-wrapper');
+  // Extract the right column: cards block (cards-wrapper)
+  const cardsWrapper = element.querySelector('.cards-wrapper');
+  let cardsBlock = null;
+  if (cardsWrapper) {
+    // Find the .cards.overlay.block inside the cardsWrapper
+    const cardsBlockElem = cardsWrapper.querySelector('.cards.overlay.block');
+    if (cardsBlockElem) {
+      cardsBlock = cardsBlockElem;
+    } else {
+      cardsBlock = cardsWrapper;
+    }
+  }
 
-  // Extract Paragraphs and Group into One Cell
-  const paragraphs = Array.from(element.querySelectorAll('p')).map(p => {
-    return p.cloneNode(true);
-  });
-  const combinedParagraphsCell = document.createElement('div');
-  combinedParagraphsCell.append(...paragraphs);
+  // Compose table rows
+  const headerRow = ['Columns (columns10)'];
+  const contentRow = [contentWrapper, cardsBlock];
 
-  // Extract Cards
-  const cards = Array.from(element.querySelectorAll('.cards li')).map(card => {
-    const titleElement = card.querySelector('.cards-card-body strong a');
-    const title = titleElement?.textContent.trim() || '';
+  // Only include columns with content to avoid empty columns (edge case)
+  // But always keep it as a two-column structure to match the visual layout
+  const cells = [headerRow, contentRow];
 
-    const imgElement = card.querySelector('img');
-    const img = imgElement
-      ? (() => {
-          const imgTag = document.createElement('img');
-          imgTag.setAttribute('src', imgElement.src);
-          imgTag.setAttribute('alt', imgElement.alt || '');
-          return imgTag;
-        })()
-      : '';
-
-    const linkElement = card.querySelector('a.callout-overlay-button');
-    const link = linkElement
-      ? (() => {
-          const linkTag = document.createElement('a');
-          linkTag.setAttribute('href', linkElement.href);
-          linkTag.textContent = linkElement.textContent.trim();
-          return linkTag;
-        })()
-      : '';
-
-    return [title, img, link];
-  });
-
-  // Create Table Structure
-  const headerRow = ['Columns'];
-  const contentRows = [
-    [header, combinedParagraphsCell],
-    ...cards.map(row => row.filter(cell => cell !== '')),
-  ];
-
-  const blockTable = WebImporter.DOMUtils.createTable([headerRow, ...contentRows], document);
-
-  // Replace Original Element
-  element.replaceWith(blockTable);
+  // Create the block table
+  const table = WebImporter.DOMUtils.createTable(cells, document);
+  element.replaceWith(table);
 }

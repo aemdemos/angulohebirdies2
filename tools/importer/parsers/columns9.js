@@ -1,44 +1,41 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const cells = [];
+  // Find the actual cards block (not carousel buttons)
+  const cardsBlock = element.querySelector('.cards.icons.block');
+  if (!cardsBlock) return;
 
-  // Add the header row dynamically based on the example
-  cells.push(['Columns']);
+  // Get all li cards
+  const cards = Array.from(cardsBlock.querySelectorAll('ul > li'));
+  if (cards.length === 0) return;
 
-  // Extract card details dynamically
-  const cards = element.querySelectorAll('.cards-card-body');
-  const images = element.querySelectorAll('.cards-card-image img');
-
-  const cardData = Array.from(cards).map((card, index) => {
-    const titleLink = card.querySelector('h3 a');
-    const titleText = titleLink ? titleLink.textContent.trim() : '';
-    const description = card.querySelector('p') ? card.querySelector('p').textContent.trim() : '';
-    const image = images[index];
-
-    const imageElement = document.createElement('img');
-    if (image) {
-      imageElement.src = image.src;
-      imageElement.alt = image.alt;
+  // Each card will be rendered as a column
+  const columns = cards.map((li) => {
+    const cellNodes = [];
+    // Image
+    const imgDiv = li.querySelector('.cards-card-image');
+    if (imgDiv) {
+      const pic = imgDiv.querySelector('picture');
+      if (pic) cellNodes.push(pic);
+      else {
+        const img = imgDiv.querySelector('img');
+        if (img) cellNodes.push(img);
+      }
     }
-
-    const titleElement = document.createElement('a');
-    if (titleLink) {
-      titleElement.href = titleLink.href;
-      titleElement.textContent = titleText;
+    // Card body (title + text)
+    const bodyDiv = li.querySelector('.cards-card-body');
+    if (bodyDiv) {
+      Array.from(bodyDiv.children).forEach(node => cellNodes.push(node));
     }
-
-    const content = document.createElement('div');
-    content.append(titleElement, document.createElement('br'), description);
-
-    return [imageElement, content];
+    return cellNodes;
   });
 
-  // Ensure card data is added dynamically
-  cells.push(...cardData);
+  // Build the cells array: header row with EXACTLY ONE cell, then one row with all columns
+  const headerRow = ['Columns (columns9)'];
+  const contentRow = columns;
 
-  // Create the final block table
-  const table = WebImporter.DOMUtils.createTable(cells, document);
+  const rows = [headerRow, contentRow];
 
-  // Replace original element with the block table
+  const table = WebImporter.DOMUtils.createTable(rows, document);
+
   element.replaceWith(table);
 }

@@ -1,64 +1,45 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Helper function to extract text content and links
-  const extractContent = (container) => {
-    const content = [];
-    if (container) {
-      const titleElement = container.querySelector('strong');
-      const linkElement = container.querySelector('a');
+  // Header row as per the block name and variant
+  const headerRow = ['Cards (cards7)'];
+  const cells = [headerRow];
 
-      if (titleElement) {
-        const title = document.createElement('p');
-        title.textContent = titleElement.textContent;
-        content.push(title);
-      }
+  // Find the columns block within the wrapper
+  const columnsBlock = element.querySelector('.columns.list.block.columns-2-cols');
+  if (!columnsBlock) return;
+  const cardDivs = Array.from(columnsBlock.children);
 
-      if (linkElement) {
-        const link = document.createElement('a');
-        link.href = linkElement.href;
-        link.title = linkElement.title;
-        link.textContent = linkElement.textContent;
-        content.push(link);
-      }
-
-      const paragraphs = container.querySelectorAll('p'); // Ensure all paragraphs are captured
-      paragraphs.forEach((para) => {
-        const paragraph = document.createElement('p');
-        paragraph.textContent = para.textContent;
-        content.push(paragraph);
-      });
-    }
-
-    return content;
-  };
-
-  const cards = [];
-
-  const sections = element.querySelectorAll('div > div');
-  sections.forEach((section) => {
-    const imageContainer = section.querySelector('picture img');
-    const textContainer = section.querySelector('div:nth-child(2)');
-
-    let image = null;
-
-    if (imageContainer) {
-      image = imageContainer.cloneNode(true);
-    }
-
-    const content = textContainer ? extractContent(textContainer) : [];
-
-    if (image && content.length > 0) {
-      // Ensure unique rows by checking for duplicates
-      const existingRow = cards.find((card) => card[1][0]?.textContent === content[0]?.textContent);
-      if (!existingRow) {
-        cards.push([image, content]);
+  cardDivs.forEach(card => {
+    // Each card: two children, first is image div, second is text div
+    const cardChildren = Array.from(card.children);
+    const imageDiv = cardChildren[0];
+    const textDiv = cardChildren[1];
+    let imageCell = null;
+    if (imageDiv) {
+      // Use <picture> if present, otherwise <img>
+      const picture = imageDiv.querySelector('picture');
+      const img = imageDiv.querySelector('img');
+      if (picture) {
+        imageCell = picture;
+      } else if (img) {
+        imageCell = img;
       }
     }
+    let textCell = null;
+    if (textDiv) {
+      // Include all children (paragraphs, links, text, etc) in the text cell
+      // Use array of children if present, else the textDiv itself
+      if (textDiv.children.length > 0) {
+        textCell = Array.from(textDiv.childNodes);
+      } else {
+        textCell = textDiv;
+      }
+    }
+    // Add this row to the table
+    cells.push([imageCell, textCell]);
   });
 
-  const blockHeader = ['Cards'];
-
-  const table = WebImporter.DOMUtils.createTable([blockHeader, ...cards], document);
-
-  element.replaceWith(table);
+  // Create and replace with block table
+  const block = WebImporter.DOMUtils.createTable(cells, document);
+  element.replaceWith(block);
 }

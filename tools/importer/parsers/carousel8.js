@@ -1,51 +1,54 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const slides = Array.from(element.querySelectorAll('.carousel > div'));
+  // Header row for the carousel block
+  const headerRow = ['Carousel (carousel8)'];
 
-  const tableContent = slides.map((slide) => {
-    const imageContainer = slide.querySelector('.carousel-image img');
+  // Get all carousel slides (direct children)
+  const slideDivs = Array.from(element.querySelectorAll(':scope > div'));
 
-    if (!imageContainer) {
-      console.warn('Missing image in carousel slide');
-      return ['', ''];
+  // Helper to extract the image cell from a slide
+  function getImageCell(slide) {
+    const imgDiv = slide.querySelector('.carousel-image');
+    if (imgDiv) {
+      // Use the first <picture> if present, else the <img>
+      const picture = imgDiv.querySelector('picture');
+      if (picture) return picture;
+      const img = imgDiv.querySelector('img');
+      if (img) return img;
     }
+    return '';
+  }
 
-    const image = document.createElement('img');
-    image.src = imageContainer.getAttribute('src');
-    image.alt = imageContainer.getAttribute('alt') || '';
-
-    const textContainer = slide.querySelector('.carousel-text');
-    const heading = textContainer ? textContainer.querySelector('h1, h2') : null;
-    const paragraphs = textContainer ? Array.from(textContainer.querySelectorAll('p')) : [];
-
-    const textElements = [];
-
-    if (heading) {
-      const headingElement = document.createElement(heading.tagName);
-      headingElement.textContent = heading.textContent.trim();
-      textElements.push(headingElement);
-    }
-
-    paragraphs.forEach((paragraph) => {
-      const link = paragraph.querySelector('a');
-      if (link) {
-        const anchor = document.createElement('a');
-        anchor.href = link.href;
-        anchor.textContent = link.textContent.trim();
-        textElements.push(anchor);
-      } else {
-        const pElement = document.createElement('p');
-        pElement.textContent = paragraph.textContent.trim();
-        textElements.push(pElement);
+  // Helper to extract the text cell from a slide. Only reference existing elements.
+  function getTextCell(slide) {
+    const textDiv = slide.querySelector('.carousel-text');
+    if (!textDiv) return '';
+    // Remove the carousel-buttons from the content cell (reference all other direct children)
+    const cellContent = [];
+    Array.from(textDiv.childNodes).forEach((node) => {
+      if (
+        node.nodeType === Node.ELEMENT_NODE &&
+        node.classList.contains('carousel-buttons')
+      ) {
+        // skip carousel nav dots
+        return;
       }
+      // Otherwise include the node (reference it as-is)
+      cellContent.push(node);
     });
+    // If only one node, return the node directly, otherwise array
+    if (cellContent.length === 1) return cellContent[0];
+    if (cellContent.length > 1) return cellContent;
+    return '';
+  }
 
-    return [image, textElements.length > 0 ? textElements : ''];
-  });
+  // Compose the rows for each slide
+  const rows = slideDivs.map(slide => [getImageCell(slide), getTextCell(slide)]);
 
-  const headerRow = ['Carousel'];
-  const cells = [headerRow, ...tableContent];
-  const blockTable = WebImporter.DOMUtils.createTable(cells, document);
+  const table = WebImporter.DOMUtils.createTable([
+    headerRow,
+    ...rows
+  ], document);
 
-  element.replaceWith(blockTable);
+  element.replaceWith(table);
 }
