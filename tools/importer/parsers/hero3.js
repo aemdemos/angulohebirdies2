@@ -1,34 +1,45 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  const hr = document.createElement('hr');
+  // Locate the hero block (handles both .hero.block and direct content)
+  let image = null;
+  let heading = null;
 
-  const blocks = [];
-
-  element.querySelectorAll('.hero-wrapper').forEach((heroWrapper) => {
-    const imageElement = heroWrapper.querySelector('img');
-    const headingElement = heroWrapper.querySelector('h1');
-
-    const image = imageElement ? document.createElement('img') : null;
-    if (imageElement) {
-      image.src = imageElement.src;
-      image.alt = imageElement.alt;
-      image.width = imageElement.width;
-      image.height = imageElement.height;
+  // Try to find the hero block wrapper
+  const heroBlock = element.querySelector('.hero.block');
+  if (heroBlock) {
+    // Try to find a div > div in hero block
+    // Sometimes .hero.block > div > div
+    // (But could be just .hero.block > div)
+    let innerDiv = heroBlock.querySelector('div > div');
+    if (!innerDiv) {
+      innerDiv = heroBlock.querySelector('div');
     }
-
-    const heading = headingElement ? document.createElement('h1') : null;
-    if (headingElement) {
-      heading.innerHTML = headingElement.innerHTML;
+    if (innerDiv) {
+      // Find the first <picture> or, if not, <img>
+      image = innerDiv.querySelector('picture') || innerDiv.querySelector('img');
+      // Find the first heading (h1-h6)
+      heading = innerDiv.querySelector('h1, h2, h3, h4, h5, h6');
     }
+  }
 
-    const cells = [
-      ['Hero'],
-      [image, heading]
-    ];
+  // Fallback: if missing, also check directly inside element
+  if (!image) {
+    image = element.querySelector('picture') || element.querySelector('img');
+  }
+  if (!heading) {
+    heading = element.querySelector('h1, h2, h3, h4, h5, h6');
+  }
 
-    const block = WebImporter.DOMUtils.createTable(cells, document);
-    blocks.push(block);
-  });
+  // Table structure from example:
+  // 1st row: ['Hero']
+  // 2nd row: [image] (optional)
+  // 3rd row: [heading] (optional)
+  // Always produce 3 rows for consistency with the example
+  const rows = [];
+  rows.push(['Hero']);
+  rows.push([image ? image : '']);
+  rows.push([heading ? heading : '']);
 
-  element.replaceWith(hr, ...blocks);
+  const table = WebImporter.DOMUtils.createTable(rows, document);
+  element.replaceWith(table);
 }

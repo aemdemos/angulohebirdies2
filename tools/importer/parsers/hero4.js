@@ -1,40 +1,31 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Create section break
-  const hr = document.createElement('hr');
+  // Find the .hero.block inside the provided section
+  const heroBlock = element.querySelector('.hero.block');
+  let pictureElem = null;
+  let headingElem = null;
 
-  // Extract the image
-  const picture = element.querySelector('picture');
-  const img = picture?.querySelector('img');
-
-  // Handle edge case for missing image
-  let imageEl = null;
-  if (img) {
-    imageEl = document.createElement('img');
-    imageEl.src = img.src;
-    imageEl.alt = img.alt;
-    imageEl.width = img.width;
-    imageEl.height = img.height;
+  if (heroBlock) {
+    // Look for picture and heading inside hero block's descendants
+    pictureElem = heroBlock.querySelector('picture');
+    // Headline: prefer h1, fallback to any heading level
+    headingElem = heroBlock.querySelector('h1, h2, h3, h4, h5, h6');
   }
+  // Fallback: search entire element if not found
+  if (!pictureElem) pictureElem = element.querySelector('picture');
+  if (!headingElem) headingElem = element.querySelector('h1, h2, h3, h4, h5, h6');
 
-  // Extract the heading
-  const heading = element.querySelector('h1');
-  const headingEl = heading ? document.createElement('h1') : null;
-  if (headingEl && heading) {
-    headingEl.textContent = heading.textContent;
-  }
+  // Table rows per spec
+  const rows = [];
+  // Header row: block type, exactly as in example
+  rows.push(['Hero']);
+  // Second row: image element, optional
+  rows.push([pictureElem || '']);
+  // Third row: all headline/subheadline/cta content, can be empty
+  rows.push([headingElem ? [headingElem] : '']);
 
-  // Create the table structure
-  const cells = [
-    ['Hero'],
-    [
-      [imageEl, headingEl].filter(Boolean), // Filter out null values
-    ],
-  ];
-
-  // Create the block table
-  const block = WebImporter.DOMUtils.createTable(cells, document);
-
-  // Replace the original element
-  element.replaceWith(hr, block);
+  // Create table
+  const table = WebImporter.DOMUtils.createTable(rows, document);
+  // Replace original element
+  element.replaceWith(table);
 }
