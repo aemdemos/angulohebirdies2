@@ -73,6 +73,9 @@ async function graphFetch(token, endpoint, initOptions) {
  * @returns {Promise<boolean>}
  */
 async function uploadFile(accessToken, driveId, folderId, file) {
+  // TODO: delete
+  throw new Error("oh I want this to fail on purpose");
+  
   const fileStream = fs.createReadStream(file.path);
   const mimeType = mime.lookup(file.path) || 'application/octet-stream';
 
