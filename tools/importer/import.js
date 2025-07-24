@@ -11,50 +11,41 @@
  */
 /* global WebImporter */
 /* eslint-disable no-console */
-import columns11Parser from './parsers/columns11.js';
-import hero4Parser from './parsers/hero4.js';
-import columns10Parser from './parsers/columns10.js';
-import carousel8Parser from './parsers/carousel8.js';
-import hero3Parser from './parsers/hero3.js';
-import cards7Parser from './parsers/cards7.js';
-import columns2Parser from './parsers/columns2.js';
-import columns9Parser from './parsers/columns9.js';
-import columns6Parser from './parsers/columns6.js';
-import carousel12Parser from './parsers/carousel12.js';
-import columns5Parser from './parsers/columns5.js';
+import cards4Parser from './parsers/cards4.js';
+import hero2Parser from './parsers/hero2.js';
+import columns3Parser from './parsers/columns3.js';
 import headerParser from './parsers/header.js';
 import metadataParser from './parsers/metadata.js';
 import cleanupTransformer from './transformers/cleanup.js';
 import imageTransformer from './transformers/images.js';
 import linkTransformer from './transformers/links.js';
+import sectionsTransformer from './transformers/sections.js';
 import { TransformHook } from './transformers/transform.js';
+import { customParsers, customTransformers, customElements } from './import.custom.js';
 import {
   generateDocumentPath,
   handleOnLoad,
-  TableBuilder,
   mergeInventory,
 } from './import.utils.js';
 
 const parsers = {
   metadata: metadataParser,
-  columns11: columns11Parser,
-  hero4: hero4Parser,
-  columns10: columns10Parser,
-  carousel8: carousel8Parser,
-  hero3: hero3Parser,
-  cards7: cards7Parser,
-  columns2: columns2Parser,
-  columns9: columns9Parser,
-  columns6: columns6Parser,
-  carousel12: carousel12Parser,
-  columns5: columns5Parser,
+  cards4: cards4Parser,
+  hero2: hero2Parser,
+  columns3: columns3Parser,
+  ...customParsers,
 };
 
 const transformers = {
   cleanup: cleanupTransformer,
   images: imageTransformer,
   links: linkTransformer,
+  sections: sectionsTransformer,
+  ...customTransformers,
 };
+
+// Additional page elements to parse that are not included in the inventory
+const pageElements = [{ name: 'metadata' }, ...customElements];
 
 WebImporter.Import = {
   findSiteUrl: (instance, siteUrls) => (
@@ -62,7 +53,7 @@ WebImporter.Import = {
   ),
   transform: (hookName, element, payload) => {
     // perform any additional transformations to the page
-    Object.entries(transformers).forEach(([, transformerFn]) => (
+    Object.values(transformers).forEach((transformerFn) => (
       transformerFn.call(this, hookName, element, payload)
     ));
   },
@@ -92,8 +83,6 @@ WebImporter.Import = {
     .map(({ xpath }) => xpath)),
 };
 
-const pageElements = [{ name: 'metadata' }];
-
 /**
 * Page transformation function
 */
@@ -112,9 +101,18 @@ function transformPage(main, { inventory, ...source }) {
       .filter((instance) => WebImporter.Import.findSiteUrl(instance, urls)?.url === originalURL)
       .map((instance) => ({
         ...block,
+        uuid: instance.uuid,
+        section: instance.section,
         element: WebImporter.Import.getElementByXPath(document, instance.xpath),
       })))
     .filter((block) => block.element);
+
+  const defaultContentElements = inventory.outliers
+    .filter((instance) => WebImporter.Import.findSiteUrl(instance, urls)?.url === originalURL)
+    .map((instance) => ({
+      ...instance,
+      element: WebImporter.Import.getElementByXPath(document, instance.xpath),
+    }));
 
   // remove fragment elements from the current page
   fragmentElements.forEach((element) => {
@@ -126,25 +124,51 @@ function transformPage(main, { inventory, ...source }) {
   // before page transform hook
   WebImporter.Import.transform(TransformHook.beforePageTransform, main, { ...source });
 
-  const tableBuilder = TableBuilder(WebImporter.DOMUtils.createTable);
-  // transform all block elements using parsers
-  [...pageElements, ...blockElements].forEach(({ element = main, ...pageBlock }) => {
-    const parserName = WebImporter.Import.getParserName(pageBlock);
-    const parserFn = parsers[parserName];
-    if (!parserFn) return;
-    try {
-      // before parse hook
-      WebImporter.Import.transform(TransformHook.beforeParse, element, { ...source });
-      // parse the element
-      WebImporter.DOMUtils.createTable = tableBuilder.build(parserName);
-      parserFn.call(this, element, { ...source });
-      WebImporter.DOMUtils.createTable = tableBuilder.restore();
-      // after parse hook
-      WebImporter.Import.transform(TransformHook.afterParse, element, { ...source });
-    } catch (e) {
-      console.warn(`Failed to parse block: ${pageBlock.key}`, e);
-    }
-  });
+  // transform all elements using parsers
+  [...defaultContentElements, ...blockElements, ...pageElements]
+    // sort elements by order in the page
+    .sort((a, b) => (a.uuid ? parseInt(a.uuid.split('-')[1], 10) - parseInt(b.uuid.split('-')[1], 10) : 999))
+    .forEach((item, idx, arr) => {
+      const { element = main, ...pageBlock } = item;
+      const isFragmentElement = fragmentElements.includes(item.element);
+      if (isFragmentElement) {
+        return;
+      }
+      const parserName = WebImporter.Import.getParserName(pageBlock);
+      const parserFn = parsers[parserName];
+      try {
+        let parserElement = element;
+        if (typeof parserElement === 'string') {
+          parserElement = main.querySelector(parserElement);
+        }
+        // before parse hook
+        WebImporter.Import.transform(
+          TransformHook.beforeParse,
+          parserElement,
+          {
+            ...source,
+            ...pageBlock,
+            nextEl: arr[idx + 1],
+          },
+        );
+        // parse the element
+        if (parserFn) {
+          parserFn.call(this, parserElement, { ...source });
+        }
+        // after parse hook
+        WebImporter.Import.transform(
+          TransformHook.afterParse,
+          parserElement,
+          {
+            ...source,
+            ...pageBlock,
+            nextEl: arr[idx + 1],
+          },
+        );
+      } catch (e) {
+        console.warn(`Failed to parse block: ${parserName}`, e);
+      }
+    });
 }
 
 /**
@@ -183,8 +207,6 @@ function transformFragment(main, { fragment, inventory, ...source }) {
       console.warn('Failed to parse header block', e);
     }
   } else {
-    const tableBuilder = TableBuilder(WebImporter.DOMUtils.createTable);
-
     (fragment.instances || [])
       .filter((instance) => {
         const siteUrl = WebImporter.Import.findSiteUrl(instance, inventory.urls);
@@ -212,9 +234,7 @@ function transformFragment(main, { fragment, inventory, ...source }) {
         const parserFn = parsers[parserName];
         if (!parserFn) return;
         try {
-          WebImporter.DOMUtils.createTable = tableBuilder.build(parserName);
           parserFn.call(this, element, source);
-          WebImporter.DOMUtils.createTable = tableBuilder.restore();
         } catch (e) {
           console.warn(`Failed to parse block: ${fragmentBlock.key}, with xpath: ${xpath}`, e);
         }
@@ -229,10 +249,6 @@ export default {
 
   transform: async (source) => {
     const { document, params: { originalURL } } = source;
-
-    // sanitize the original URL
-    /* eslint-disable no-param-reassign */
-    source.params.originalURL = new URL(originalURL).href;
 
     /* eslint-disable-next-line prefer-const */
     let publishUrl = window.location.origin;
