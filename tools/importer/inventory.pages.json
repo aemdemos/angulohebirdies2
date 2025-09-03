@@ -1,0 +1,128 @@
+{
+  "templates": [
+    {
+      "name": "'Corporate Multi-Section Layout'",
+      "cluster": 1,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/fundraising-events",
+          "uuid": "7fa6891341c5b78f0dae8212a6b447b9827f95a7"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/all-other-programs",
+          "uuid": "30ae9ff7c780f88ce4c43e91731f5162b9ad0625"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/charities-we-support",
+          "uuid": "49d93f32ce1f4b46f49f02b95f62145489f1004a"
+        }
+      ]
+    },
+    {
+      "name": "'Generic Content Page'",
+      "cluster": 2,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/connect-thanks",
+          "uuid": "5f4c4b253734179985b3ed7c4b795920d216ce1a"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/partners",
+          "uuid": "6f8cacd812b6abc0507de290ef389d8adab01d68"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/privacy",
+          "uuid": "2b2bb280ffef4204c29704df3c2c28ba3a0c2a52"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/donate",
+          "uuid": "962e9271e3c47afbc306ea849b2933a19aacda1f"
+        }
+      ]
+    },
+    {
+      "name": "'Content Showcase'",
+      "cluster": 3,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/connect",
+          "uuid": "44305c78299ece3022cde8bd662281465a1e71f9"
+        },
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/callaway-warrior-club-fittings",
+          "uuid": "2752521fa504d05197568d35d065a06995812e5d"
+        }
+      ]
+    },
+    {
+      "name": "News Listing",
+      "cluster": 4,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/volunteers",
+          "uuid": "31823a7d641d0e8d6dbdec98f6e3764017e66592"
+        }
+      ]
+    },
+    {
+      "name": "'Forum Page'",
+      "cluster": 5,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/footer",
+          "uuid": "0a8903562a7617b738c3e8491e8aa51b6008081f"
+        }
+      ]
+    },
+    {
+      "name": "'Video Gallery Page'",
+      "cluster": 6,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/gallery",
+          "uuid": "589d3a071939584b7753f0c724475b89a873d170"
+        }
+      ]
+    },
+    {
+      "name": "'Article Page'",
+      "cluster": 7,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/terms-of-service",
+          "uuid": "ff6eafd98bb0e723e046a544073093604606f052"
+        }
+      ]
+    },
+    {
+      "name": "'Portfolio Showcase'",
+      "cluster": 8,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/",
+          "uuid": "544066079f784df68543cb3606be7a3eb7e6f09f"
+        }
+      ]
+    },
+    {
+      "name": "'Media Showcase Page'",
+      "cluster": 9,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/player-supporters",
+          "uuid": "422a2c759d92d9191bc72f4859ba1d64ce407e62"
+        }
+      ]
+    },
+    {
+      "name": "'Article Page'",
+      "cluster": 10,
+      "pages": [
+        {
+          "url": "https://main--birdiesforthebrave--hlxsites.hlx.page/about-us",
+          "uuid": "d23392fa44f1d6b46a258473f9494d064b02a34d"
+        }
+      ]
+    }
+  ]
+}
