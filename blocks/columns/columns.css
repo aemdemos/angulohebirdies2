@@ -1,3 +1,4 @@
+
 .columns > div {
   display: flex;
   flex-direction: column;
@@ -29,5 +30,128 @@
   .columns > div > div {
     flex: 1;
     order: unset;
+  }
+}
+
+.columns.columns10 {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+  align-items: stretch;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.columns.columns10 > div {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.columns.columns10 > div + div {
+  margin-left: -1px;
+  border-left: none;
+  background: transparent;
+}
+
+.columns.columns10 .columns-img-col {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 340px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.columns.columns10 .columns-img-col picture,
+.columns.columns10 .columns-img-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.columns.columns10 > div > div:not(.columns-img-col) {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 25.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.25em 2%;
+  background: rgb(0 113 188 / 85%);
+  box-sizing: border-box;
+  pointer-events: none;
+  border-radius: 0;
+  z-index: 2;
+  overflow: hidden;
+  border: none;
+  box-shadow: none;
+}
+
+.columns.columns10 .button-container .button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2.25em;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-align: center;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+  pointer-events: auto;
+  white-space: normal;
+  line-height: 1.08;
+  max-width: none;
+}
+
+@media (width <= 900px) {
+  .columns.columns10 {
+    flex-direction: column;
+  }
+
+  .columns.columns10 > div {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .columns.columns10 .columns-img-col {
+    min-height: 220px;
+  }
+
+  .columns.columns10 > div > div:not(.columns-img-col) {
+    height: 38%;
+    font-size: 1.2em;
   }
 }
