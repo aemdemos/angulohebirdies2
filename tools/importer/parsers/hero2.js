@@ -1,29 +1,66 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
-  // Creating a section break
-  const hr = document.createElement('hr');
+  // Header row: block name exactly as in the example
+  const headerRow = ['Hero'];
 
-  // Extracting the hero image and heading dynamically
-  const heroImage = element.querySelector('picture');
-  const heroHeading = element.querySelector('h1');
+  // Try to find the content root containing image and text
+  let contentRoot = element;
+  const heroWrapper = element.querySelector('.hero-wrapper');
+  if (heroWrapper) {
+    const heroBlock = heroWrapper.querySelector('.hero.block');
+    if (heroBlock) {
+      // Go deeper to find the div with image and content
+      const inners = heroBlock.querySelectorAll(':scope > div > div');
+      if (inners.length > 0) {
+        contentRoot = inners[0];
+      } else {
+        const directDiv = heroBlock.querySelector(':scope > div');
+        if (directDiv) contentRoot = directDiv;
+      }
+    }
+  }
 
-  // Handle missing elements gracefully
-  const imageContent = heroImage ? heroImage : document.createTextNode('No Image Available');
-  const headingContent = heroHeading ? document.createElement('h1') : document.createTextNode('No Heading Available');
-  if (heroHeading) headingContent.textContent = heroHeading.textContent;
+  // Find the first image (picture or img) in contentRoot
+  let imageEl = null;
+  // Look for a <p> that contains a <picture> or <img>
+  const imageP = Array.from(contentRoot.children).find(child => {
+    if (child.tagName.toLowerCase() === 'p' && child.querySelector('picture')) return true;
+    if (child.tagName.toLowerCase() === 'p' && child.querySelector('img')) return true;
+    return false;
+  });
+  if (imageP && imageP.querySelector('picture')) {
+    imageEl = imageP.querySelector('picture');
+  } else if (imageP && imageP.querySelector('img')) {
+    imageEl = imageP.querySelector('img');
+  } else {
+    // fallback: direct picture or img
+    const picture = contentRoot.querySelector('picture');
+    if (picture) imageEl = picture;
+    else {
+      const img = contentRoot.querySelector('img');
+      if (img) imageEl = img;
+    }
+  }
 
-  // Correcting the header row to match example exactly
-  const headerRow = ['Hero']; // Matches the example header specifically
+  // Gather content nodes for the main text content
+  const contentNodes = [];
+  Array.from(contentRoot.children).forEach(child => {
+    if (imageEl && (child.contains(imageEl) || child === imageEl)) {
+      // skip image-containing element
+      return;
+    }
+    // Only push if there's actual text or an element
+    if (child.textContent.trim() !== '' || child.children.length > 0) {
+      contentNodes.push(child);
+    }
+  });
 
-  // Structure for the Hero block table - single cell in the content row
-  const tableCells = [
-    headerRow,  // Header row with exact match to example
-    [[imageContent, headingContent]],  // Content row combining image and heading into a single cell
-  ];
+  // Only add the content row if there is non-empty content
+  const rows = [headerRow];
+  if (imageEl) rows.push([imageEl]);
+  if (contentNodes.length) rows.push([contentNodes]);
 
-  // Creating the block table using WebImporter.DOMUtils.createTable
-  const blockTable = WebImporter.DOMUtils.createTable(tableCells, document);
-
-  // Replacing the original element with the section break and block table
-  element.replaceWith(hr, blockTable);
+  // Create and replace
+  const table = WebImporter.DOMUtils.createTable(rows, document);
+  element.replaceWith(table);
 }
