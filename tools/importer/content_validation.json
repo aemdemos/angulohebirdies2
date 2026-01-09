@@ -89,7 +89,50 @@
           "url": "https://www.birdiesforthebrave.org/player-supporters",
           "urlHash": "422a2c759d92d9191bc72f4859ba1d64ce407e62",
           "uuid": "422a2c75-00-b2c8ec8cc7206114599cd049698cc67e0e048d63",
-          "xpath": "/html[1]/body[1]/header[1]"
+          "xpath": "/html[1]/body[1]/header[1]",
+          "differences": [
+            {
+              "change_type": "equal",
+              "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Your"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Do"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Privacy"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Not"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Choices"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Sell My Personal Information"
+            },
+            {
+              "change_type": "equal",
+              "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+            }
+          ],
+          "similarity_score": 0.901237492162579
         },
         {
           "url": "https://www.birdiesforthebrave.org/connect",
@@ -242,7 +285,50 @@
           "url": "https://www.birdiesforthebrave.org/player-supporters",
           "urlHash": "422a2c759d92d9191bc72f4859ba1d64ce407e62",
           "uuid": "422a2c75-02-a507e040135207256fc0c4fd07f12510b5a9e729",
-          "xpath": "/html[1]/body[1]/footer[1]"
+          "xpath": "/html[1]/body[1]/footer[1]",
+          "differences": [
+            {
+              "change_type": "equal",
+              "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Your"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Do"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Privacy"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Not"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Choices"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Sell My Personal Information"
+            },
+            {
+              "change_type": "equal",
+              "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+            }
+          ],
+          "similarity_score": 0.901237492162579
         },
         {
           "url": "https://www.birdiesforthebrave.org/connect",
@@ -397,7 +483,50 @@
           "url": "https://www.birdiesforthebrave.org/player-supporters",
           "urlHash": "422a2c759d92d9191bc72f4859ba1d64ce407e62",
           "uuid": "422a2c75-02-a507e040135207256fc0c4fd07f12510b5a9e729",
-          "xpath": "/html[1]/body[1]/footer[1]"
+          "xpath": "/html[1]/body[1]/footer[1]",
+          "differences": [
+            {
+              "change_type": "equal",
+              "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Your"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Do"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Privacy"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Not"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Choices"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Sell My Personal Information"
+            },
+            {
+              "change_type": "equal",
+              "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+            }
+          ],
+          "similarity_score": 0.901237492162579
         },
         {
           "url": "https://www.birdiesforthebrave.org/connect",
@@ -553,7 +682,50 @@
           "url": "https://www.birdiesforthebrave.org/player-supporters",
           "urlHash": "422a2c759d92d9191bc72f4859ba1d64ce407e62",
           "uuid": "422a2c75-00-b2c8ec8cc7206114599cd049698cc67e0e048d63",
-          "xpath": "/html[1]/body[1]/header[1]"
+          "xpath": "/html[1]/body[1]/header[1]",
+          "differences": [
+            {
+              "change_type": "equal",
+              "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Your"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Do"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Privacy"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Not"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Choices"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Sell My Personal Information"
+            },
+            {
+              "change_type": "equal",
+              "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+            }
+          ],
+          "similarity_score": 0.901237492162579
         },
         {
           "url": "https://www.birdiesforthebrave.org/connect",
@@ -760,7 +932,50 @@
           "url": "https://www.birdiesforthebrave.org/player-supporters",
           "urlHash": "422a2c759d92d9191bc72f4859ba1d64ce407e62",
           "uuid": "422a2c75-01-537891fbd27262d2dc4b84b6afdb15392f581f70",
-          "xpath": "/html[1]/body[1]/main[1]"
+          "xpath": "/html[1]/body[1]/main[1]",
+          "differences": [
+            {
+              "change_type": "equal",
+              "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Your"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Do"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Privacy"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Not"
+            },
+            {
+              "change_type": "equal",
+              "text": " "
+            },
+            {
+              "change_type": "deletion",
+              "text": "Choices"
+            },
+            {
+              "change_type": "insertion",
+              "text": "Sell My Personal Information"
+            },
+            {
+              "change_type": "equal",
+              "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+            }
+          ],
+          "similarity_score": 0.901237492162579
         }
       ]
     },
@@ -1229,6 +1444,52 @@
         }
       ],
       "similarity_score": 0.9954609667784553
+    },
+    {
+      "url": "https://www.birdiesforthebrave.org/player-supporters",
+      "differences": [
+        {
+          "change_type": "equal",
+          "text": "About Us Charities we Support Programs at PGA Tour Events Donate Coming Soon! Charitable Solicitations Disclosure Terms of Service Cookie Choices "
+        },
+        {
+          "change_type": "deletion",
+          "text": "Your"
+        },
+        {
+          "change_type": "insertion",
+          "text": "Do"
+        },
+        {
+          "change_type": "equal",
+          "text": " "
+        },
+        {
+          "change_type": "deletion",
+          "text": "Privacy"
+        },
+        {
+          "change_type": "insertion",
+          "text": "Not"
+        },
+        {
+          "change_type": "equal",
+          "text": " "
+        },
+        {
+          "change_type": "deletion",
+          "text": "Choices"
+        },
+        {
+          "change_type": "insertion",
+          "text": "Sell My Personal Information"
+        },
+        {
+          "change_type": "equal",
+          "text": " Privacy Connect b4b@pgatourhq.com \u00a9 2024 Birdies for the Brave. All rights reserved. https://www.facebook.com/birdiesforthebrave https://twitter.com/BirdiesForBrave https://www.instagram.com/birdiesforthebrave/"
+        }
+      ],
+      "similarity_score": 0.901237492162579
     }
   ]
 }
