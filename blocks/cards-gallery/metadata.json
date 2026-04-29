@@ -1,0 +1,39 @@
+{
+  "variantName": "cards-gallery",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-04-28T07:15:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.wknd-trendsetters.site/",
+    "originPage": "homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "gallery",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "grid of square images",
+    "buttonCount": 0,
+    "imageCount": 8
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "image galleries",
+      "photo grids",
+      "visual portfolios"
+    ],
+    "notSuitableFor": [
+      "cards with text descriptions",
+      "article listings",
+      "feature grids with icons"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/content/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-04-28T07:15:00.000Z"
+  }
+}
