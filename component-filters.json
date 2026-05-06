@@ -25,6 +25,18 @@
     ]
   },
   {
+    "id": "cards-article",
+    "components": [
+      "cards-article-card"
+    ]
+  },
+  {
+    "id": "cards-gallery",
+    "components": [
+      "cards-gallery-card"
+    ]
+  },
+  {
     "id": "cards",
     "components": [
       "card"
